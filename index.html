@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background-color: #0d0d0d;
+      color: #ffffff;
+      padding: 30px;
+      margin: 0;
+    }
+
+    h1 {
+      text-align: center;
+      color: #ff00ff;
+      text-shadow: 0 0 5px #ff00ff;
+      margin-bottom: 40px;
+    }
+
+    .dashboard {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+    }
+
+    .card {
+      background: #1a1a1a;
+      border: 2px solid #00fff7;
+      box-shadow: 0 0 15px #00fff7;
+      border-radius: 12px;
+      width: 280px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #ff00ff;
+    }
+
+    .card h2 {
+      color: #00fff7;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ffffff;
+      text-shadow: 0 0 5px #00fff7;
+    }
+
+    .category-table {
+      margin-top: 50px;
+      background: #1a1a1a;
+      padding: 25px;
+      border-radius: 12px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 0 15px #ff00ff;
+    }
+
+    .category-table h3 {
+      text-align: center;
+      color: #ff00ff;
+      margin-bottom: 20px;
+      text-shadow: 0 0 5px #ff00ff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #333;
+      color: #00fff7;
+      text-align: left;
+    }
+
+    tr:hover {
+      background-color: #262626;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cyberpunk Financial Dashboard</h1>
+  <div class="dashboard">
+    <div class="card">
+      <h2>Total Income</h2>
+      <p id="income">$0</p>
+    </div>
+    <div class="card">
+      <h2>Total Expenses</h2>
+      <p id="expense">$0</p>
+    </div>
+    <div class="card">
+      <h2>Net Balance</h2>
+      <p id="balance">$0</p>
+    </div>
+  </div>
+
+  <div class="category-table">
+    <h3>Expenses by Category</h3>
+    <table id="categoryTable">
+      <tr><th>Category</th><th>Amount</th></tr>
+    </table>
+  </div>
+
+  <script>
+    function loadData() {
+      google.script.run.withSuccessHandler(function(data) {
+        document.getElementById("income").innerText = "$" + data.income.toFixed(2);
+        document.getElementById("expense").innerText = "$" + data.expense.toFixed(2);
+        document.getElementById("balance").innerText = "$" + data.balance.toFixed(2);
+
+        const table = document.getElementById("categoryTable");
+        for (const category in data.categories) {
+          const row = document.createElement("tr");
+          row.innerHTML = `<td>${category}</td><td>$${data.categories[category].toFixed(2)}</td>`;
+          table.appendChild(row);
+        }
+      }).getFinancialSummary();
+    }
+
+    window.onload = loadData;
+  </script>
+</body>
+</html>
