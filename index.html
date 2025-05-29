@@ -96,15 +96,15 @@
   <div class="dashboard">
     <div class="card">
       <h2>Total Income</h2>
-      <p id="income">$0</p>
+      <p id="income">₩0</p>
     </div>
     <div class="card">
       <h2>Total Expenses</h2>
-      <p id="expense">$0</p>
+      <p id="expense">₩0</p>
     </div>
     <div class="card">
       <h2>Net Balance</h2>
-      <p id="balance">$0</p>
+      <p id="balance">₩0</p>
     </div>
   </div>
 
@@ -118,14 +118,14 @@
   <script>
     function loadData() {
       google.script.run.withSuccessHandler(function(data) {
-        document.getElementById("income").innerText = "$" + data.income.toFixed(2);
-        document.getElementById("expense").innerText = "$" + data.expense.toFixed(2);
-        document.getElementById("balance").innerText = "$" + data.balance.toFixed(2);
+        document.getElementById("income").innerText = "₩" + data.income.toLocaleString();
+        document.getElementById("expense").innerText = "₩" + data.expense.toLocaleString();
+        document.getElementById("balance").innerText = "₩" + data.balance.toLocaleString();
 
         const table = document.getElementById("categoryTable");
         for (const category in data.categories) {
           const row = document.createElement("tr");
-          row.innerHTML = `<td>${category}</td><td>$${data.categories[category].toFixed(2)}</td>`;
+          row.innerHTML = `<td>${category}</td><td>₩${data.categories[category].toLocaleString()}</td>`;
           table.appendChild(row);
         }
       }).getFinancialSummary();
