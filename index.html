@@ -116,22 +116,33 @@
   </div>
 
   <script>
-    function loadData() {
-      google.script.run.withSuccessHandler(function(data) {
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbwipHegS-uW1KcSE_ibemBlxP_zzOpWibbemtw0bC5FSDp-kyvucsXp-_0A4xpE1K3psw/exec"; // Replace with your actual Apps Script Web App URL
+
+    async function loadData() {
+      try {
+        const response = await fetch(scriptUrl);
+        if (!response.ok) throw new Error("Network response was not ok");
+        const data = await response.json();
+
         document.getElementById("income").innerText = "₩" + data.income.toLocaleString();
         document.getElementById("expense").innerText = "₩" + data.expense.toLocaleString();
         document.getElementById("balance").innerText = "₩" + data.balance.toLocaleString();
 
         const table = document.getElementById("categoryTable");
+        table.innerHTML = "<tr><th>Category</th><th>Amount</th></tr>"; // Reset table
+
         for (const category in data.categories) {
           const row = document.createElement("tr");
           row.innerHTML = `<td>${category}</td><td>₩${data.categories[category].toLocaleString()}</td>`;
           table.appendChild(row);
         }
-      }).getFinancialSummary();
+      } catch (error) {
+        console.error("Error fetching financial data:", error);
+      }
     }
 
     window.onload = loadData;
+    setInterval(loadData, 60000); // Optional: Refresh every 60 seconds
   </script>
 </body>
 </html>
