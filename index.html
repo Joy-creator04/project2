@@ -12,8 +12,9 @@
       --text-color: #ffffff;
       --accent1: #ff00ff;
       --accent2: #00fff7;
-      --card-bg: #1a1a1a;
-      --hover-bg: #262626;
+      --card-bg: rgba(26, 26, 26, 0.7);
+      --hover-bg: rgba(38, 38, 38, 0.7);
+      --glass-blur: blur(8px);
     }
 
     body.day-mode {
@@ -21,8 +22,9 @@
       --text-color: #111;
       --accent1: #0077ff;
       --accent2: #00bcd4;
-      --card-bg: #ffffff;
-      --hover-bg: #eeeeee;
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --hover-bg: rgba(238, 238, 238, 0.85);
+      --glass-blur: none;
     }
 
     body {
@@ -77,6 +79,7 @@
 
     .card {
       background: var(--card-bg);
+      backdrop-filter: var(--glass-blur);
       border: 2px solid var(--accent2);
       box-shadow: 0 0 15px var(--accent2);
       border-radius: 12px;
@@ -84,6 +87,7 @@
       padding: 20px;
       text-align: center;
       transition: transform 0.3s ease, box-shadow 0.3s;
+      position: relative;
     }
 
     .card:hover {
@@ -104,9 +108,27 @@
       text-shadow: 0 0 5px var(--accent2);
     }
 
+    .card .tooltip {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: var(--hover-bg);
+      color: var(--text-color);
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 4px;
+      box-shadow: 0 0 5px var(--accent1);
+      display: none;
+    }
+
+    .card:hover .tooltip {
+      display: block;
+    }
+
     .category-table {
       margin-top: 50px;
       background: var(--card-bg);
+      backdrop-filter: var(--glass-blur);
       padding: 25px;
       border-radius: 12px;
       max-width: 600px;
@@ -138,6 +160,20 @@
       background-color: var(--hover-bg);
     }
 
+    .currency-selector {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .currency-selector select {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: 'Orbitron', sans-serif;
+      background-color: var(--card-bg);
+      color: var(--accent1);
+      border: 1px solid var(--accent1);
+    }
+
     @media (max-width: 768px) {
       .dashboard {
         flex-direction: column;
@@ -157,16 +193,28 @@
 
   <h1>Cyberpunk Financial Dashboard</h1>
 
+  <div class="currency-selector">
+    <label for="currency">Currency: </label>
+    <select id="currency">
+      <option value="KRW">₩ KRW</option>
+      <option value="USD">$ USD</option>
+      <option value="EUR">€ EUR</option>
+    </select>
+  </div>
+
   <div class="dashboard">
     <div class="card">
+      <div class="tooltip">Total earned income</div>
       <h2>Total Income</h2>
       <p id="income">₩0</p>
     </div>
     <div class="card">
+      <div class="tooltip">All expenses combined</div>
       <h2>Total Expenses</h2>
       <p id="expense">₩0</p>
     </div>
     <div class="card">
+      <div class="tooltip">Income minus expenses</div>
       <h2>Net Balance</h2>
       <p id="balance">₩0</p>
     </div>
@@ -182,7 +230,7 @@
   <button class="toggle-mode" onclick="toggleMode()">Toggle Mode</button>
 
   <script>
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbwipHegS-uW1KcSE_ibemBlxP_zzOpWibbemtw0bC5FSDp-kyvucsXp-_0A4xpE1K3psw/exec"; // Replace if needed
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbwipHegS-uW1KcSE_ibemBlxP_zzOpWibbemtw0bC5FSDp-kyvucsXp-_0A4xpE1K3psw/exec";
 
     async function loadData() {
       try {
@@ -190,16 +238,21 @@
         if (!response.ok) throw new Error("Network response was not ok");
         const data = await response.json();
 
-        document.getElementById("income").innerText = "₩" + data.income.toLocaleString();
-        document.getElementById("expense").innerText = "₩" + data.expense.toLocaleString();
-        document.getElementById("balance").innerText = "₩" + data.balance.toLocaleString();
+        const currency = document.getElementById("currency").value;
+        const rate = { "KRW": 1, "USD": 0.00077, "EUR": 0.00071 }[currency];
+        const symbol = { "KRW": "₩", "USD": "$", "EUR": "€" }[currency];
+
+        document.getElementById("income").innerText = symbol + Math.round(data.income * rate).toLocaleString();
+        document.getElementById("expense").innerText = symbol + Math.round(data.expense * rate).toLocaleString();
+        document.getElementById("balance").innerText = symbol + Math.round(data.balance * rate).toLocaleString();
 
         const table = document.getElementById("categoryTable");
-        table.innerHTML = "<tr><th>Category</th><th>Amount</th></tr>"; // Reset table
+        table.innerHTML = "<tr><th>Category</th><th>Amount</th></tr>";
 
         for (const category in data.categories) {
           const row = document.createElement("tr");
-          row.innerHTML = `<td>${category}</td><td>₩${data.categories[category].toLocaleString()}</td>`;
+          const value = Math.round(data.categories[category] * rate);
+          row.innerHTML = `<td>${category}</td><td>${symbol}${value.toLocaleString()}</td>`;
           table.appendChild(row);
         }
       } catch (error) {
@@ -211,8 +264,9 @@
       document.body.classList.toggle("day-mode");
     }
 
+    document.getElementById("currency").addEventListener("change", loadData);
     window.onload = loadData;
-    setInterval(loadData, 60000); // Refresh every 60 seconds
+    setInterval(loadData, 60000);
   </script>
 </body>
 </html>
