@@ -268,7 +268,16 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbyBue2yThzGR0Nw44g3rWVOotuvo5lSCr92HoN6codELWcXy5JT0u2QZQgEr3WwlmDnSw/exec"; // Replace with your actual script ID
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbyBue2yThzGR0Nw44g3rWVOotuvo5lSCr92HoN6codELWcXy5JT0u2QZQgEr3WwlmDnSw/exec"; // Replace with your Apps Script URL
+
+    function convertDateFormat(dateString) {
+      // Convert yyyy-mm-dd to dd-mm-yy
+      const parts = dateString.split("-");
+      const dd = parts[2];
+      const mm = parts[1];
+      const yy = parts[0].slice(2);
+      return `${dd}-${mm}-${yy}`;
+    }
 
     async function loadData() {
       try {
@@ -330,7 +339,7 @@
 
     function toggleMode() {
       document.body.classList.toggle("day-mode");
-      loadData(); // Refresh to update chart font color
+      loadData(); // Refresh chart colors
     }
 
     document.getElementById("currency").addEventListener("change", loadData);
@@ -339,10 +348,14 @@
 
     document.getElementById("entryForm").addEventListener("submit", async function (e) {
       e.preventDefault();
+
+      const rawDate = document.getElementById("date").value;
+      const convertedDate = convertDateFormat(rawDate);
+
       const formData = {
-        date: document.getElementById("date").value,
-        category: document.getElementById("category").value,
-        description: document.getElementById("description").value,
+        date: convertedDate,
+        category: document.getElementById("category").value.trim(),
+        description: document.getElementById("description").value.trim(),
         type: document.getElementById("type").value,
         amount: parseFloat(document.getElementById("amount").value)
       };
@@ -366,7 +379,7 @@
           document.getElementById("entryForm").reset();
           loadData();
         } else {
-          msg.innerText = "❌ Failed: " + result.error;
+          msg.innerText = "❌ Failed: " + (result.error || "Unknown error");
         }
       } catch (err) {
         document.getElementById("entryMsg").innerText = "❌ Error submitting data.";
