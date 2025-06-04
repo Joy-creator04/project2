@@ -270,7 +270,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbwlU_punes_vLuUE6dLKUGY73qFagcixFVRe5FpePrWJZo9V4dB7j-k49TMcKp3q7F4XA/exec";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbyGuSqFwI0xwA4A1mqYlulQUzi_EZ6mQQGlvmDg6KRiPYyR3h-_TXYtnzgAnBI-dOIjWA/exec";
 
     async function loadData() {
       try {
@@ -300,7 +300,7 @@
           table.appendChild(row);
         }
 
-        // Render chart
+        // Chart
         const ctx = document.getElementById("categoryChart").getContext("2d");
         const chartColors = ['#ff00ff', '#00fff7', '#ffaa00', '#00ff44', '#4477ff', '#ff4444', '#aa00ff'];
         if (window.myChart) window.myChart.destroy();
@@ -360,7 +360,7 @@
         const msg = document.getElementById("entryMsg");
         if (result.success) {
           msg.innerText = "✅ Transaction added successfully!";
-          loadData(); // Refresh data
+          loadData();
         } else {
           msg.innerText = "❌ Failed: " + result.error;
         }
