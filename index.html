@@ -126,14 +126,12 @@
     }
 
     .category-table {
-      margin-top: 50px;
+      margin: 50px auto 0 auto;
       background: var(--card-bg);
       backdrop-filter: var(--glass-blur);
       padding: 25px;
       border-radius: 12px;
       max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
       box-shadow: 0 0 15px var(--accent1);
     }
 
@@ -260,7 +258,7 @@
         <option value="Income">Income</option>
         <option value="Expenses">Expenses</option>
       </select>
-      <input type="number" id="amount" placeholder="Amount (₩)" required />
+      <input type="number" id="amount" placeholder="Amount (₩)" required min="0" />
       <button type="submit">Submit</button>
     </form>
     <p id="entryMsg" style="text-align:center; margin-top:10px;"></p>
@@ -270,7 +268,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbyGuSqFwI0xwA4A1mqYlulQUzi_EZ6mQQGlvmDg6KRiPYyR3h-_TXYtnzgAnBI-dOIjWA/exec";
+    const scriptUrl = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"; // Replace with your actual script ID
 
     async function loadData() {
       try {
@@ -300,14 +298,13 @@
           table.appendChild(row);
         }
 
-        // Chart
         const ctx = document.getElementById("categoryChart").getContext("2d");
         const chartColors = ['#ff00ff', '#00fff7', '#ffaa00', '#00ff44', '#4477ff', '#ff4444', '#aa00ff'];
         if (window.myChart) window.myChart.destroy();
         window.myChart = new Chart(ctx, {
           type: 'pie',
           data: {
-            labels: labels,
+            labels,
             datasets: [{
               data: values,
               backgroundColor: chartColors,
@@ -333,6 +330,7 @@
 
     function toggleMode() {
       document.body.classList.toggle("day-mode");
+      loadData(); // Refresh to update chart font color
     }
 
     document.getElementById("currency").addEventListener("change", loadData);
@@ -346,8 +344,13 @@
         category: document.getElementById("category").value,
         description: document.getElementById("description").value,
         type: document.getElementById("type").value,
-        amount: document.getElementById("amount").value
+        amount: parseFloat(document.getElementById("amount").value)
       };
+
+      if (formData.amount <= 0 || isNaN(formData.amount)) {
+        document.getElementById("entryMsg").innerText = "❌ Please enter a valid amount.";
+        return;
+      }
 
       try {
         const res = await fetch(scriptUrl, {
@@ -360,6 +363,7 @@
         const msg = document.getElementById("entryMsg");
         if (result.success) {
           msg.innerText = "✅ Transaction added successfully!";
+          document.getElementById("entryForm").reset();
           loadData();
         } else {
           msg.innerText = "❌ Failed: " + result.error;
