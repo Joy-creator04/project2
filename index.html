@@ -268,7 +268,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbyBue2yThzGR0Nw44g3rWVOotuvo5lSCr92HoN6codELWcXy5JT0u2QZQgEr3WwlmDnSw/exec"; // Replace with your Apps Script URL
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbzLMeVdgzWYJr_O_tIxZ-w-ywtO1WnGlKA9dAozzUUoVHsACJ_ZMNdZE8-s0fuqCWY81A/exec";
 
     function convertDateFormat(dateString) {
       // Convert yyyy-mm-dd to dd-mm-yy
@@ -279,113 +279,150 @@
       return `${dd}-${mm}-${yy}`;
     }
 
-    async function loadData() {
+    async function fetchData() {
       try {
-        const response = await fetch(scriptUrl);
-        if (!response.ok) throw new Error("Network response was not ok");
+        const response = await fetch(scriptUrl + "?action=getData");
         const data = await response.json();
 
-        const currency = document.getElementById("currency").value;
-        const rate = { "KRW": 1, "USD": 0.00077, "EUR": 0.00071 }[currency];
-        const symbol = { "KRW": "₩", "USD": "$", "EUR": "€" }[currency];
-
-        document.getElementById("income").innerText = symbol + Math.round(data.income * rate).toLocaleString();
-        document.getElementById("expense").innerText = symbol + Math.round(data.expense * rate).toLocaleString();
-        document.getElementById("balance").innerText = symbol + Math.round(data.balance * rate).toLocaleString();
-
-        const table = document.getElementById("categoryTable");
-        table.innerHTML = "<tr><th>Category</th><th>Amount</th></tr>";
-        const labels = [];
-        const values = [];
-
-        for (const category in data.categories) {
-          const value = Math.round(data.categories[category] * rate);
-          labels.push(category);
-          values.push(value);
-          const row = document.createElement("tr");
-          row.innerHTML = `<td>${category}</td><td>${symbol}${value.toLocaleString()}</td>`;
-          table.appendChild(row);
-        }
-
-        const ctx = document.getElementById("categoryChart").getContext("2d");
-        const chartColors = ['#ff00ff', '#00fff7', '#ffaa00', '#00ff44', '#4477ff', '#ff4444', '#aa00ff'];
-        if (window.myChart) window.myChart.destroy();
-        window.myChart = new Chart(ctx, {
-          type: 'pie',
-          data: {
-            labels,
-            datasets: [{
-              data: values,
-              backgroundColor: chartColors,
-              borderColor: "#111",
-              borderWidth: 1
-            }]
-          },
-          options: {
-            plugins: {
-              legend: {
-                labels: {
-                  color: getComputedStyle(document.body).getPropertyValue('--text-color')
-                }
-              }
-            }
-          }
-        });
-
+        updateDashboard(data);
+        updateCategoryTable(data);
+        updateCategoryChart(data);
       } catch (error) {
-        console.error("Error fetching financial data:", error);
+        console.error("Fetch error:", error);
       }
     }
 
-    function toggleMode() {
-      document.body.classList.toggle("day-mode");
-      loadData(); // Refresh chart colors
+    function formatCurrency(value, currency) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency }).format(value);
     }
 
-    document.getElementById("currency").addEventListener("change", loadData);
-    window.onload = loadData;
-    setInterval(loadData, 60000);
+    function updateDashboard(data) {
+      let income = 0;
+      let expenses = 0;
+      data.forEach(entry => {
+        if (entry.Type === "Income") income += Number(entry.Amount);
+        else if (entry.Type === "Expenses") expenses += Number(entry.Amount);
+      });
+      const balance = income - expenses;
 
-    document.getElementById("entryForm").addEventListener("submit", async function (e) {
+      const currency = document.getElementById("currency").value;
+
+      document.getElementById("income").textContent = formatCurrency(income, currency);
+      document.getElementById("expense").textContent = formatCurrency(expenses, currency);
+      document.getElementById("balance").textContent = formatCurrency(balance, currency);
+    }
+
+    function updateCategoryTable(data) {
+      const table = document.getElementById("categoryTable");
+      // Clear all rows except header
+      while (table.rows.length > 1) table.deleteRow(1);
+
+      const categoryTotals = {};
+      data.forEach(entry => {
+        if (entry.Type === "Expenses") {
+          categoryTotals[entry.Category] = (categoryTotals[entry.Category] || 0) + Number(entry.Amount);
+        }
+      });
+
+      for (const [cat, amt] of Object.entries(categoryTotals)) {
+        const row = table.insertRow();
+        const cell1 = row.insertCell(0);
+        const cell2 = row.insertCell(1);
+        cell1.textContent = cat;
+        cell2.textContent = formatCurrency(amt, document.getElementById("currency").value);
+      }
+    }
+
+    let categoryChart;
+    function updateCategoryChart(data) {
+      const ctx = document.getElementById("categoryChart").getContext('2d');
+      const categoryTotals = {};
+      data.forEach(entry => {
+        if (entry.Type === "Expenses") {
+          categoryTotals[entry.Category] = (categoryTotals[entry.Category] || 0) + Number(entry.Amount);
+        }
+      });
+      const labels = Object.keys(categoryTotals);
+      const amounts = Object.values(categoryTotals);
+
+      if (categoryChart) categoryChart.destroy();
+
+      categoryChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: amounts,
+            backgroundColor: [
+              '#FF00FF', '#00FFF7', '#FF007F', '#00FF90',
+              '#FF4500', '#1E90FF', '#FFD700', '#ADFF2F'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          plugins: {
+            legend: { position: 'right', labels: { color: 'var(--accent2)' } }
+          }
+        }
+      });
+    }
+
+    document.getElementById("currency").addEventListener("change", fetchData);
+
+    document.getElementById("entryForm").addEventListener("submit", async (e) => {
       e.preventDefault();
+      const date = convertDateFormat(document.getElementById("date").value);
+      const category = document.getElementById("category").value.trim();
+      const description = document.getElementById("description").value.trim();
+      const type = document.getElementById("type").value;
+      const amount = Number(document.getElementById("amount").value);
 
-      const rawDate = document.getElementById("date").value;
-      const convertedDate = convertDateFormat(rawDate);
-
-      const formData = {
-        date: convertedDate,
-        category: document.getElementById("category").value.trim(),
-        description: document.getElementById("description").value.trim(),
-        type: document.getElementById("type").value,
-        amount: parseFloat(document.getElementById("amount").value)
-      };
-
-      if (formData.amount <= 0 || isNaN(formData.amount)) {
-        document.getElementById("entryMsg").innerText = "❌ Please enter a valid amount.";
+      if (!date || !category || !description || !type || amount <= 0) {
+        alert("Please fill in all fields correctly.");
         return;
       }
 
+      const payload = {
+        date: date,
+        category: category,
+        description: description,
+        type: type,
+        amount: amount
+      };
+
       try {
-        const res = await fetch(scriptUrl, {
+        const response = await fetch(scriptUrl + "?action=addData", {
           method: "POST",
-          body: JSON.stringify(formData),
+          body: JSON.stringify(payload),
           headers: { "Content-Type": "application/json" }
         });
 
-        const result = await res.json();
-        const msg = document.getElementById("entryMsg");
-        if (result.success) {
-          msg.innerText = "✅ Transaction added successfully!";
-          document.getElementById("entryForm").reset();
-          loadData();
+        const result = await response.json();
+
+        if (result.status === "success") {
+          document.getElementById("entryMsg").textContent = "Entry added successfully!";
+          document.getElementById("entryMsg").style.color = "limegreen";
+          e.target.reset();
+          fetchData();
         } else {
-          msg.innerText = "❌ Failed: " + (result.error || "Unknown error");
+          document.getElementById("entryMsg").textContent = "Failed to add entry.";
+          document.getElementById("entryMsg").style.color = "red";
         }
-      } catch (err) {
-        document.getElementById("entryMsg").innerText = "❌ Error submitting data.";
-        console.error(err);
+      } catch (error) {
+        console.error(error);
+        document.getElementById("entryMsg").textContent = "Error adding entry.";
+        document.getElementById("entryMsg").style.color = "red";
       }
     });
+
+    function toggleMode() {
+      document.body.classList.toggle("day-mode");
+      fetchData();
+    }
+
+    // Initial load
+    fetchData();
   </script>
 </body>
 </html>
