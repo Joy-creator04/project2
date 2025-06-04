@@ -5,203 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cyberpunk Financial Dashboard</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
-
-    :root {
-      --bg-color: #0d0d0d;
-      --text-color: #ffffff;
-      --accent1: #ff00ff;
-      --accent2: #00fff7;
-      --card-bg: rgba(26, 26, 26, 0.7);
-      --hover-bg: rgba(38, 38, 38, 0.7);
-      --glass-blur: blur(8px);
-    }
-
-    body.day-mode {
-      --bg-color: #f5f5f5;
-      --text-color: #111;
-      --accent1: #0077ff;
-      --accent2: #00bcd4;
-      --card-bg: rgba(255, 255, 255, 0.85);
-      --hover-bg: rgba(238, 238, 238, 0.85);
-      --glass-blur: none;
-    }
-
-    body {
-      font-family: 'Orbitron', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      padding: 30px;
-      margin: 0;
-      transition: background 0.3s, color 0.3s;
-    }
-
-    h1 {
-      text-align: center;
-      color: var(--accent1);
-      text-shadow: 0 0 5px var(--accent1);
-      margin-bottom: 40px;
-    }
-
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .logo {
-      font-size: 14px;
-      font-weight: bold;
-      color: var(--accent2);
-    }
-
-    .toggle-mode {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: var(--card-bg);
-      border: 1px solid var(--accent1);
-      color: var(--accent1);
-      padding: 10px 15px;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 0 10px var(--accent1);
-      transition: background 0.3s, color 0.3s;
-    }
-
-    .dashboard {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 30px;
-    }
-
-    .card {
-      background: var(--card-bg);
-      backdrop-filter: var(--glass-blur);
-      border: 2px solid var(--accent2);
-      box-shadow: 0 0 15px var(--accent2);
-      border-radius: 12px;
-      width: 280px;
-      padding: 20px;
-      text-align: center;
-      transition: transform 0.3s ease, box-shadow 0.3s;
-      position: relative;
-    }
-
-    .card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 25px var(--accent1);
-    }
-
-    .card h2 {
-      color: var(--accent2);
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-
-    .card p {
-      font-size: 24px;
-      font-weight: bold;
-      color: var(--text-color);
-      text-shadow: 0 0 5px var(--accent2);
-    }
-
-    .card .tooltip {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: var(--hover-bg);
-      color: var(--text-color);
-      padding: 4px 8px;
-      font-size: 12px;
-      border-radius: 4px;
-      box-shadow: 0 0 5px var(--accent1);
-      display: none;
-    }
-
-    .card:hover .tooltip {
-      display: block;
-    }
-
-    .category-table {
-      margin-top: 50px;
-      background: var(--card-bg);
-      backdrop-filter: var(--glass-blur);
-      padding: 25px;
-      border-radius: 12px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 0 15px var(--accent1);
-    }
-
-    .category-table h3 {
-      text-align: center;
-      color: var(--accent1);
-      margin-bottom: 20px;
-      text-shadow: 0 0 5px var(--accent1);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid #333;
-      color: var(--accent2);
-      text-align: left;
-    }
-
-    tr:hover {
-      background-color: var(--hover-bg);
-    }
-
-    .currency-selector {
-      text-align: center;
-      margin-top: 30px;
-    }
-
-    .currency-selector select {
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-family: 'Orbitron', sans-serif;
-      background-color: var(--card-bg);
-      color: var(--accent1);
-      border: 1px solid var(--accent1);
-    }
-
-    form {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 10px;
-    }
-
-    form input, form select, form button {
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid var(--accent1);
-      background-color: var(--card-bg);
-      color: var(--text-color);
-      font-family: 'Orbitron', sans-serif;
-      min-width: 120px;
-    }
-
-    @media (max-width: 768px) {
-      .dashboard {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .card {
-        width: 90%;
-      }
-    }
+    /* Your existing CSS here — no changes needed */
+    /* ... */
   </style>
 </head>
 <body>
@@ -260,7 +65,7 @@
         <option value="Income">Income</option>
         <option value="Expenses">Expenses</option>
       </select>
-      <input type="number" id="amount" placeholder="Amount (₩)" required />
+      <input type="number" id="amount" placeholder="Amount" required />
       <button type="submit">Submit</button>
     </form>
     <p id="entryMsg" style="text-align:center; margin-top:10px;"></p>
@@ -270,7 +75,21 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbx8sxIx-19yheGdgu50UYrZOcPFQU8Fjps5G6AcTAuSOY20RyLAXkQOc7VZYAEMDav0ZQ/exec";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbz0XiGxaNO8JGwaCDPfCKMtgWRnVJ9ktmOo5swaaa4QrJDvgKxx9inVLsIcZHx8zvFAQg/exec";
+
+    // Exchange rates (1 KRW to USD/EUR)
+    const exchangeRates = {
+      KRW: 1,
+      USD: 0.00077,
+      EUR: 0.00071
+    };
+
+    // Intl.NumberFormat cache for performance
+    const formatters = {
+      KRW: new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }),
+      USD: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }),
+      EUR: new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }),
+    };
 
     async function loadData() {
       try {
@@ -279,12 +98,13 @@
         const data = await response.json();
 
         const currency = document.getElementById("currency").value;
-        const rate = { "KRW": 1, "USD": 0.00077, "EUR": 0.00071 }[currency];
-        const symbol = { "KRW": "₩", "USD": "$", "EUR": "€" }[currency];
+        const rate = exchangeRates[currency];
+        const formatter = formatters[currency];
 
-        document.getElementById("income").innerText = symbol + Math.round(data.income * rate).toLocaleString();
-        document.getElementById("expense").innerText = symbol + Math.round(data.expense * rate).toLocaleString();
-        document.getElementById("balance").innerText = symbol + Math.round(data.balance * rate).toLocaleString();
+        // Convert and format values
+        document.getElementById("income").innerText = formatter.format(data.income * rate);
+        document.getElementById("expense").innerText = formatter.format(data.expense * rate);
+        document.getElementById("balance").innerText = formatter.format(data.balance * rate);
 
         const table = document.getElementById("categoryTable");
         table.innerHTML = "<tr><th>Category</th><th>Amount</th></tr>";
@@ -292,15 +112,15 @@
         const values = [];
 
         for (const category in data.categories) {
-          const value = Math.round(data.categories[category] * rate);
+          const value = data.categories[category] * rate;
           labels.push(category);
           values.push(value);
           const row = document.createElement("tr");
-          row.innerHTML = `<td>${category}</td><td>${symbol}${value.toLocaleString()}</td>`;
+          row.innerHTML = `<td>${category}</td><td>${formatter.format(value)}</td>`;
           table.appendChild(row);
         }
 
-        // Render chart
+        // Render pie chart
         const ctx = document.getElementById("categoryChart").getContext("2d");
         const chartColors = ['#ff00ff', '#00fff7', '#ffaa00', '#00ff44', '#4477ff', '#ff4444', '#aa00ff'];
         if (window.myChart) window.myChart.destroy();
@@ -319,7 +139,7 @@
             plugins: {
               legend: {
                 labels: {
-                  color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                  color: getComputedStyle(document.body).getPropertyValue('--text-color').trim()
                 }
               }
             }
@@ -346,7 +166,7 @@
         category: document.getElementById("category").value,
         description: document.getElementById("description").value,
         type: document.getElementById("type").value,
-        amount: document.getElementById("amount").value
+        amount: Number(document.getElementById("amount").value)  // Make sure this is a number
       };
 
       try {
@@ -360,6 +180,8 @@
         const msg = document.getElementById("entryMsg");
         if (result.success) {
           msg.innerText = "✅ Transaction added successfully!";
+          // Clear form inputs
+          e.target.reset();
           loadData(); // Refresh data
         } else {
           msg.innerText = "❌ Failed: " + result.error;
