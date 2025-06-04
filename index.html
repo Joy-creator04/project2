@@ -268,7 +268,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbxL6ErwKSEA94MCsLmUHTDYvldl9esVKLB0CDmgzfXIMMDOKNmbSFsCD7n1zPyauhVzOw/exec";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbxdEhO3n1IHnJ3ZVLLDdcaz7czw4jf7NIx1Yry5RHpmTR7dUorPOpR7us__JwZoIn0z_w/exec";
 
     function convertDateFormat(dateString) {
       // Convert yyyy-mm-dd to dd-mm-yy
@@ -392,36 +392,31 @@
       };
 
       try {
-        const response = await fetch(scriptUrl + "?action=addData", {
+        const res = await fetch(scriptUrl + "?action=addEntry", {
           method: "POST",
-          body: JSON.stringify(payload),
-          headers: { "Content-Type": "application/json" }
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
         });
-
-        const result = await response.json();
-
+        const result = await res.json();
         if (result.status === "success") {
           document.getElementById("entryMsg").textContent = "Entry added successfully!";
-          document.getElementById("entryMsg").style.color = "limegreen";
           e.target.reset();
           fetchData();
+          setTimeout(() => { document.getElementById("entryMsg").textContent = ""; }, 3000);
         } else {
           document.getElementById("entryMsg").textContent = "Failed to add entry.";
-          document.getElementById("entryMsg").style.color = "red";
         }
       } catch (error) {
-        console.error(error);
         document.getElementById("entryMsg").textContent = "Error adding entry.";
-        document.getElementById("entryMsg").style.color = "red";
+        console.error(error);
       }
     });
 
     function toggleMode() {
       document.body.classList.toggle("day-mode");
-      fetchData();
+      fetchData(); // refresh so colors update if needed
     }
 
-    // Initial load
     fetchData();
   </script>
 </body>
